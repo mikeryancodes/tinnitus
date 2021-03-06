@@ -3,7 +3,7 @@ import safeStartOscillator from './safeStartOscillator';
 
 const RATIOS = [0.766, 0.9, 1.1, 1.4];
 
-export default function Acr({ enabled, show, pitch, oscillator }) {
+export default function Acr({ enabled, pitch, oscillator }) {
   const [playing, setPlaying] = useState(false);
   const playingRef = useRef(false);
 
@@ -15,8 +15,6 @@ export default function Acr({ enabled, show, pitch, oscillator }) {
     setPlaying(newValue);
     playingRef.current = newValue;
   }, [setPlaying]);
-
-  useEffect(() => !show && updatePlaying(false), [show, updatePlaying]);
 
   const start = useCallback(async () => {
     let lastIndex;
@@ -34,10 +32,10 @@ export default function Acr({ enabled, show, pitch, oscillator }) {
     }
   }, [oscillator, playingRef, pitches]);
 
-  useEffect(() => play && start(), [play, start]);
+  useEffect(() => play ? start() : updatePlaying(false), [play, updatePlaying, start]);
 
   return (
-    <div style={{ display: show ? 'block' : 'none' }}>
+    <div style={{ display: enabled ? 'block' : 'none' }}>
       <div>
         Pitches: {pitches.join(', ')}
       </div>

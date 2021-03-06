@@ -7,8 +7,6 @@ import getSystem from './getSystem'
 function App() {
   const [pitch, setPitch] = useState(880);
   const [view, setView] = useState('selectPitch');
-  const [selectPitchEnabled, setSelectPitchEnabled] = useState(true);
-  const [acrEnabled, setAcrEnabled] = useState(false);
 
   const { oscillator, volumeNode, panNode } = useMemo(getSystem, []);
 
@@ -24,25 +22,16 @@ function App() {
         />
       </div>
       <span>
-        <button disabled={view === 'selectPitch'} onClick={() => {
-          setView('selectPitch');
-          setAcrEnabled(false);
-          setSelectPitchEnabled(true);
-        }}>
+        <button disabled={view === 'selectPitch'} onClick={() => setView('selectPitch')}>
           Select pitch
         </button>
-        <button disabled={view === 'acr'} onClick={() => {
-          setView('acr');
-          setSelectPitchEnabled(false);
-          setAcrEnabled(true);
-        }}>
+        <button disabled={view === 'acr'} onClick={() => setView('acr')}>
           ACR
         </button>
       </span>
       <div>
         <SelectPitch
-          enabled={selectPitchEnabled}
-          show={view === 'selectPitch'}
+          enabled={view === 'selectPitch'}
           pitch={pitch}
           setPitch={setPitch}
           oscillator={oscillator}
@@ -50,8 +39,7 @@ function App() {
       </div>
       <div>
         <Acr
-          enabled={acrEnabled}
-          show={view === 'acr'}
+          enabled={view === 'acr'}
           pitch={pitch}
           oscillator={oscillator}
         />

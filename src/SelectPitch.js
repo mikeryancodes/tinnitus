@@ -5,18 +5,18 @@ const RANGE_MAX = 1000;
 const PITCH_MIN = 20;
 const PITCH_MAX = 15000;
 
-export default function SelectPitch({ enabled, show, pitch, setPitch, oscillator }) {
+export default function SelectPitch({ enabled, pitch, setPitch, oscillator }) {
   const [playing, setPlaying] = useState(false);
 
   const play = enabled && playing;
 
   useEffect(() => play && safeStartOscillator(oscillator), [play, oscillator]);
   useEffect(() => oscillator.context[play ? 'resume' : 'suspend'](), [play, oscillator]);
-  useEffect(() => !show && setPlaying(false), [show]);
+  useEffect(() => !enabled && setPlaying(false), [enabled]);
   useEffect(() => oscillator.frequency.setValueAtTime(pitch, oscillator.context.currentTime), [pitch, oscillator]);
 
   return (
-    <div style={{ display: show ? 'block' : 'none' }}>
+    <div style={{ display: enabled ? 'block' : 'none' }}>
       <div>
         <button onClick={() => setPlaying(!playing)}>
           {playing ? 'Stop' : 'Play'}
