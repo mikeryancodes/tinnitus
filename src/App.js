@@ -8,7 +8,7 @@ function App() {
   const [view, setView] = useState('selectPitch');
   const [selectPitchEnabled, setSelectPitchEnabled] = useState(true);
   const [acrEnabled, setAcrEnabled] = useState(false);
-  const [volume, setVolume] = useState(5);
+  const [volume, setVolume] = useState(.5);
   const [pan, setPan] = useState(0);
 
   return (
