@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import safeStartOscillator from './safeStartOscillator';
 
 const RATIOS = [0.766, 0.9, 1.1, 1.4];
@@ -7,9 +7,9 @@ export default function Acr({ enabled, show, pitch, oscillator }) {
   const [playing, setPlaying] = useState(false);
   const playingRef = useRef(false);
 
-  const pitches = RATIOS.map((r) => (r * pitch).toFixed(2));
+  const pitches = useMemo(() => RATIOS.map((r) => (r * pitch).toFixed(2)), [pitch]);
 
-  const play = playing && enabled;
+  const play = useMemo(() => playing && enabled, [playing, enabled]);
 
   const start = useCallback(async () => {
     let lastIndex;
