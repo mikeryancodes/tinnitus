@@ -11,9 +11,14 @@ export default function Acr({ enabled, show, pitch, oscillator }) {
 
   const play = useMemo(() => playing && enabled, [playing, enabled]);
 
+  const updatePlaying = useCallback((newValue) => {
+    setPlaying(newValue);
+    playingRef.current = newValue;
+  }, [setPlaying]);
+
   const start = useCallback(async () => {
     let lastIndex;
-    while (true) {
+    while (playingRef.current) {
       for (let i = 1; i <= 3; i++) {
         const indexPermutation = getValidIndexPermutation(p => p[0] !== lastIndex); // eslint-disable-line no-loop-func
         for (let p = 0; p <= 3; p++) {
@@ -24,7 +29,6 @@ export default function Acr({ enabled, show, pitch, oscillator }) {
         lastIndex = indexPermutation[3];
       }
       await delay(1333);
-      if (!playingRef.current) return;
     }
   }, [oscillator, playingRef, pitches]);
 
@@ -32,9 +36,8 @@ export default function Acr({ enabled, show, pitch, oscillator }) {
 
   useEffect(() => {
     if (show) return;
-    setPlaying(false);
-    playingRef.current = false;
-  }, [show]);
+    updatePlaying(false);
+  }, [show, updatePlaying]);
 
   return (
     <div style={{ display: show ? 'block' : 'none' }}>
@@ -42,11 +45,7 @@ export default function Acr({ enabled, show, pitch, oscillator }) {
         Pitches: {pitches.join(', ')}
       </div>
       <div>
-        <button onClick={() => {
-          const newValue = !playing;
-          setPlaying(newValue);
-          playingRef.current = newValue;
-        }}>
+        <button onClick={() => updatePlaying(!playing)}>
           {playing ? 'Stop' : 'Play'}
         </button>
       </div>
