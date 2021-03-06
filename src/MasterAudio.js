@@ -9,8 +9,8 @@ export default function MasterAudio({ volume, setVolume, pan, setPan }) {
           type="range"
           min="0"
           max="100"
-          onChange={(e) => setVolume(Number(e.target.value) / 10)}
-          value={volume * 10}
+          onChange={(e) => setVolume(Number(e.target.value) / 100)}
+          value={volume * 100}
         />
       </div>
       <div>
