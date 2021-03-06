@@ -16,6 +16,8 @@ export default function Acr({ enabled, show, pitch, oscillator }) {
     playingRef.current = newValue;
   }, [setPlaying]);
 
+  useEffect(() => !show && updatePlaying(false), [show, updatePlaying]);
+
   const start = useCallback(async () => {
     let lastIndex;
     while (playingRef.current) {
@@ -33,11 +35,6 @@ export default function Acr({ enabled, show, pitch, oscillator }) {
   }, [oscillator, playingRef, pitches]);
 
   useEffect(() => play && start(), [play, start]);
-
-  useEffect(() => {
-    if (show) return;
-    updatePlaying(false);
-  }, [show, updatePlaying]);
 
   return (
     <div style={{ display: show ? 'block' : 'none' }}>
