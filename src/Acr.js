@@ -24,6 +24,7 @@ export default function Acr({ enabled, show, pitch, oscillator }) {
         lastIndex = indexPermutation[3];
       }
       await delay(1333);
+      if (!playingRef.current) return;
     }
   }, [oscillator, playingRef, pitches]);
 
