@@ -1,23 +1,28 @@
-import React, { useState } from 'react';
-import MasterAudio from './MasterAudio';
+import React, { useState, useMemo } from 'react';
+import OutputControls from './OutputControls';
 import SelectPitch from './SelectPitch';
 import Acr from './Acr';
+import getSystem from './getSystem'
 
 function App() {
   const [pitch, setPitch] = useState(880);
   const [view, setView] = useState('selectPitch');
   const [selectPitchEnabled, setSelectPitchEnabled] = useState(true);
   const [acrEnabled, setAcrEnabled] = useState(false);
-  const [volume, setVolume] = useState(.5);
-  const [pan, setPan] = useState(0);
+
+  const { oscillator, volumeNode, panNode, audioContext } = useMemo(getSystem, []);
 
   return (
     <div className="App">
       <div>
-        Pitch: {pitch} | Volume: {volume} | Pan: {pan}
+        Pitch: {pitch}
       </div>
       <div>
-        <MasterAudio volume={volume} setVolume={setVolume} pan={pan} setPan={setPan} />
+        <OutputControls
+          volumeNode={volumeNode}
+          panNode={panNode}
+          audioContext={audioContext}
+        />
       </div>
       <span>
         <button disabled={view === 'selectPitch'} onClick={() => {
@@ -41,8 +46,8 @@ function App() {
           show={view === 'selectPitch'}
           pitch={pitch}
           setPitch={setPitch}
-          pan={pan}
-          volume={volume}
+          oscillator={oscillator}
+          audioContext={audioContext}
         />
       </div>
       <div>
@@ -50,8 +55,8 @@ function App() {
           enabled={acrEnabled}
           show={view === 'acr'}
           pitch={pitch}
-          pan={pan}
-          volume={volume}
+          oscillator={oscillator}
+          audioContext={audioContext}
         />
       </div>
     </div>

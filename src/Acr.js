@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 const RATIOS = [0.766, 0.9, 1.1, 1.4];
 
-export default function Acr({ enabled, show, pitch, volume, pan }) {
+export default function Acr({ enabled, show, pitch, oscillator, audioContext }) {
   const [playing, setPlaying] = useState(false);
   const playingRef = useRef(false);
 
@@ -10,34 +10,23 @@ export default function Acr({ enabled, show, pitch, volume, pan }) {
 
   const play = playing && enabled;
 
-  const audioContext = useMemo(() => new window.AudioContext(), []);
+  const start = useCallback(async () => {
+    let lastIndex;
+    while (true) {
+      for (let i = 1; i <= 3; i++) {
+        const indexPermutation = getValidIndexPermutation(p => p[0] !== lastIndex); // eslint-disable-line no-loop-func
+        for (let p = 0; p <= 3; p++) {
+          const pitch = pitches[indexPermutation[p]];
+          await playPitch(pitch, oscillator, audioContext);
+          if (!playingRef.current) return;
+        }
+        lastIndex = indexPermutation[3];
+      }
+      await delay(1333);
+    }
+  }, [oscillator, audioContext, playingRef, pitches]);
 
-  const panNode = useMemo(() => {
-    const pn = audioContext.createStereoPanner();
-    pn.pan.setValueAtTime(pan, audioContext.currentTime);
-    pn.connect(audioContext.destination);
-    return pn;
-  }, []);
-
-  const volumeNode = useMemo(() => {
-    const vn = audioContext.createGain();
-    vn.gain.setValueAtTime(volume, audioContext.currentTime);
-    vn.connect(panNode);
-    return vn;
-  }, []);
-
-  const oscillator = useMemo(() => {
-    const o = audioContext.createOscillator();
-    o.type = 'sine';
-    o.connect(volumeNode);
-    return o;
-  }, []);
-
-  useEffect(() => volumeNode.gain.setValueAtTime(volume, audioContext.currentTime), [volume, audioContext]);
-
-  useEffect(() => panNode.pan.setValueAtTime(pan, audioContext.currentTime), [pan, audioContext]);
-
-  useEffect(() => play && start(), [play]);
+  useEffect(() => play && start(), [play, start]);
 
   useEffect(() => {
     if (show) return;
@@ -61,22 +50,6 @@ export default function Acr({ enabled, show, pitch, volume, pan }) {
       </div>
     </div>
   );
-
-  async function start() {
-    let lastIndex;
-    while (true) {
-      for (let i = 1; i <= 3; i++) {
-        const indexPermutation = getValidIndexPermutation(p => p[0] !== lastIndex);
-        for (let p = 0; p <= 3; p++) {
-          const pitch = pitches[indexPermutation[p]];
-          await playPitch(pitch, oscillator, audioContext);
-          if (!playingRef.current) return;
-        }
-        lastIndex = indexPermutation[3];
-      }
-      await delay(1333);
-    }
-  }
 }
 
 async function playPitch(pitch, oscillator, audioContext) {

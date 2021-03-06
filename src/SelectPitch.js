@@ -1,41 +1,13 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const RANGE_MAX = 1000;
 const PITCH_MIN = 20;
 const PITCH_MAX = 15000;
 
-export default function SelectPitch({ enabled, show, pitch, setPitch, pan, volume }) {
+export default function SelectPitch({ enabled, show, pitch, setPitch, oscillator, audioContext }) {
   const [playing, setPlaying] = useState(false);
 
   const play = enabled && playing;
-
-  const audioContext = useMemo(() => new window.AudioContext(), []);
-
-  const panNode = useMemo(() => {
-    const pn = audioContext.createStereoPanner();
-    pn.pan.setValueAtTime(pan, audioContext.currentTime);
-    pn.connect(audioContext.destination);
-    return pn;
-  }, []);
-
-  const volumeNode = useMemo(() => {
-    const vn = audioContext.createGain();
-    vn.gain.setValueAtTime(volume, audioContext.currentTime);
-    vn.connect(panNode);
-    return vn;
-  }, []);
-
-  const oscillator = useMemo(() => {
-    const o = audioContext.createOscillator();
-    o.type = 'sine';
-    o.frequency.setValueAtTime(pitch, audioContext.currentTime);
-    o.connect(volumeNode);
-    return o;
-  }, []);
-
-  useEffect(() => volumeNode.gain.setValueAtTime(volume, audioContext.currentTime), [volume, audioContext]);
-
-  useEffect(() => panNode.pan.setValueAtTime(pan, audioContext.currentTime), [pan, audioContext]);
 
   useEffect(() => {
     if (!play) return;
@@ -45,11 +17,11 @@ export default function SelectPitch({ enabled, show, pitch, setPitch, pan, volum
       if (safeStartError(e)) return;
       throw e;
     }
-  }, [play]);
+  }, [play, oscillator]);
 
   useEffect(() => !show && setPlaying(false), [show]);
-  useEffect(() => audioContext[play ? 'resume' : 'suspend'](), [play]);
-  useEffect(() => oscillator.frequency.setValueAtTime(pitch, audioContext.currentTime), [pitch]);
+  useEffect(() => audioContext[play ? 'resume' : 'suspend'](), [play, audioContext]);
+  useEffect(() => oscillator.frequency.setValueAtTime(pitch, audioContext.currentTime), [pitch, oscillator, audioContext]);
 
   return (
     <div style={{ display: show ? 'block' : 'none' }}>
