@@ -2,10 +2,10 @@ import React from 'react';
 import Volume from './Volume';
 import Pan from './Pan';
 
-const OutputControls = ({ volumeNode, panNode, audioContext }) => (
+const OutputControls = ({ volumeNode, panNode }) => (
   <div>
-    <Volume volumeNode={volumeNode} audioContext={audioContext} />
-    <Pan panNode={panNode} audioContext={audioContext} />
+    <Volume volumeNode={volumeNode} />
+    <Pan panNode={panNode} />
   </div>
 );
 

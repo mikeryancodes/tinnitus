@@ -10,7 +10,7 @@ function App() {
   const [selectPitchEnabled, setSelectPitchEnabled] = useState(true);
   const [acrEnabled, setAcrEnabled] = useState(false);
 
-  const { oscillator, volumeNode, panNode, audioContext } = useMemo(getSystem, []);
+  const { oscillator, volumeNode, panNode } = useMemo(getSystem, []);
 
   return (
     <div className="App">
@@ -21,7 +21,6 @@ function App() {
         <OutputControls
           volumeNode={volumeNode}
           panNode={panNode}
-          audioContext={audioContext}
         />
       </div>
       <span>
@@ -47,7 +46,6 @@ function App() {
           pitch={pitch}
           setPitch={setPitch}
           oscillator={oscillator}
-          audioContext={audioContext}
         />
       </div>
       <div>
@@ -56,7 +54,6 @@ function App() {
           show={view === 'acr'}
           pitch={pitch}
           oscillator={oscillator}
-          audioContext={audioContext}
         />
       </div>
     </div>

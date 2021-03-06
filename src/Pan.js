@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 
-const Pan = ({ panNode, audioContext }) => {
+const Pan = ({ panNode }) => {
   const [pan, setPan] = useState(0);
 
-  useEffect(() => panNode.pan.setValueAtTime(pan, audioContext.currentTime), [pan, panNode, audioContext]);
+  useEffect(() => panNode.pan.setValueAtTime(pan, panNode.context.currentTime), [pan, panNode]);
 
   return (
     <div>

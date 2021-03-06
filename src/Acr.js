@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 const RATIOS = [0.766, 0.9, 1.1, 1.4];
 
-export default function Acr({ enabled, show, pitch, oscillator, audioContext }) {
+export default function Acr({ enabled, show, pitch, oscillator }) {
   const [playing, setPlaying] = useState(false);
   const playingRef = useRef(false);
 
@@ -17,14 +17,14 @@ export default function Acr({ enabled, show, pitch, oscillator, audioContext }) 
         const indexPermutation = getValidIndexPermutation(p => p[0] !== lastIndex); // eslint-disable-line no-loop-func
         for (let p = 0; p <= 3; p++) {
           const pitch = pitches[indexPermutation[p]];
-          await playPitch(pitch, oscillator, audioContext);
+          await playPitch(pitch, oscillator);
           if (!playingRef.current) return;
         }
         lastIndex = indexPermutation[3];
       }
       await delay(1333);
     }
-  }, [oscillator, audioContext, playingRef, pitches]);
+  }, [oscillator, playingRef, pitches]);
 
   useEffect(() => play && start(), [play, start]);
 
@@ -52,12 +52,12 @@ export default function Acr({ enabled, show, pitch, oscillator, audioContext }) 
   );
 }
 
-async function playPitch(pitch, oscillator, audioContext) {
-  oscillator.frequency.setValueAtTime(pitch, audioContext.currentTime);
+async function playPitch(pitch, oscillator) {
+  oscillator.frequency.setValueAtTime(pitch, oscillator.context.currentTime);
   safeStartOscillator(oscillator);
-  audioContext.resume();
+  oscillator.context.resume();
   await delay(150);
-  audioContext.suspend();
+  oscillator.context.suspend();
   await delay(17);
 }
 

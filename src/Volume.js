@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 
-const Volume = ({ volumeNode, audioContext }) => {
+const Volume = ({ volumeNode }) => {
   const [volume, setVolume] = useState(0.5);
 
-  useEffect(() => volumeNode.gain.setValueAtTime(volume, audioContext.currentTime), [volume, volumeNode, audioContext]);
+  useEffect(() => volumeNode.gain.setValueAtTime(volume, volumeNode.context.currentTime), [volume, volumeNode]);
 
   return (
     <div>

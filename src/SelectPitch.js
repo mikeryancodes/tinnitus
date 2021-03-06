@@ -4,7 +4,7 @@ const RANGE_MAX = 1000;
 const PITCH_MIN = 20;
 const PITCH_MAX = 15000;
 
-export default function SelectPitch({ enabled, show, pitch, setPitch, oscillator, audioContext }) {
+export default function SelectPitch({ enabled, show, pitch, setPitch, oscillator }) {
   const [playing, setPlaying] = useState(false);
 
   const play = enabled && playing;
@@ -20,8 +20,8 @@ export default function SelectPitch({ enabled, show, pitch, setPitch, oscillator
   }, [play, oscillator]);
 
   useEffect(() => !show && setPlaying(false), [show]);
-  useEffect(() => audioContext[play ? 'resume' : 'suspend'](), [play, audioContext]);
-  useEffect(() => oscillator.frequency.setValueAtTime(pitch, audioContext.currentTime), [pitch, oscillator, audioContext]);
+  useEffect(() => oscillator.context[play ? 'resume' : 'suspend'](), [play, oscillator]);
+  useEffect(() => oscillator.frequency.setValueAtTime(pitch, oscillator.context.currentTime), [pitch, oscillator]);
 
   return (
     <div style={{ display: show ? 'block' : 'none' }}>
