@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import safeStartOscillator from './safeStartOscillator';
 
 const RANGE_MAX = 1000;
 const PITCH_MIN = 20;
@@ -9,18 +10,9 @@ export default function SelectPitch({ enabled, show, pitch, setPitch, oscillator
 
   const play = enabled && playing;
 
-  useEffect(() => {
-    if (!play) return;
-    try {
-      oscillator.start();
-    } catch (e) {
-      if (safeStartError(e)) return;
-      throw e;
-    }
-  }, [play, oscillator]);
-
-  useEffect(() => !show && setPlaying(false), [show]);
+  useEffect(() => play && safeStartOscillator(oscillator), [play, oscillator]);
   useEffect(() => oscillator.context[play ? 'resume' : 'suspend'](), [play, oscillator]);
+  useEffect(() => !show && setPlaying(false), [show]);
   useEffect(() => oscillator.frequency.setValueAtTime(pitch, oscillator.context.currentTime), [pitch, oscillator]);
 
   return (
@@ -48,9 +40,4 @@ function getPitch(rangePosition) {
 
 function getRangePosition(pitch) {
   return Math.round(RANGE_MAX * Math.log(pitch / PITCH_MIN) / Math.log(PITCH_MAX / PITCH_MIN));
-}
-
-function safeStartError(e) {
-  const message = "Failed to execute 'start' on 'AudioScheduledSourceNode': cannot call start more than once.";
-  return (e.message === message);
 }

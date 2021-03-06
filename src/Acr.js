@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import safeStartOscillator from './safeStartOscillator';
 
 const RATIOS = [0.766, 0.9, 1.1, 1.4];
 
@@ -61,15 +62,6 @@ async function playPitch(pitch, oscillator) {
   await delay(17);
 }
 
-function safeStartOscillator(oscillator) {
-  try {
-    oscillator.start();
-  } catch (e) {
-    if (safeStartError(e)) return;
-    throw e;
-  }
-}
-
 async function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -109,9 +101,4 @@ function getIndexPermutations() {
     [3, 2, 0, 1],
     [3, 2, 1, 0]
   ]
-}
-
-function safeStartError(e) {
-  const message = "Failed to execute 'start' on 'AudioScheduledSourceNode': cannot call start more than once.";
-  return (e.message === message);
 }
