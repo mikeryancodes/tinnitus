@@ -13,11 +13,7 @@ const Pan = ({ panNode }) => {
         min="0"
         max="100"
         value={panToValue(pan)}
-        onChange={(e) => {
-          const value = Number(e.target.value);
-          const newPan = valueToPan(value);
-          setPan(newPan);
-        }}
+        onChange={(e) => setPan(valueToPan(e.target.value))}
       />
     </div>
   );

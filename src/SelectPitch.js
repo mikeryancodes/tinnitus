@@ -22,10 +22,14 @@ export default function SelectPitch({ enabled, pitch, setPitch, oscillator }) {
           {playing ? 'Stop' : 'Play'}
         </button>
       </div>
-      <input type="range" min="0" max={RANGE_MAX} value={getRangePosition(pitch)} style={{ width: 800 }} onChange={(e) => {
-        const { value } = e.target;
-        setPitch(getPitch(value));
-      }}/>
+      <input
+        type="range"
+        min="0"
+        max={RANGE_MAX}
+        value={getRangePosition(pitch)}
+        style={{ width: 800 }}
+        onChange={(e) => setPitch(getPitch(e.target.value))}
+      />
     </div>
   );
 };

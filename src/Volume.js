@@ -13,11 +13,7 @@ const Volume = ({ volumeNode }) => {
         min="0"
         max="100"
         value={volumeToValue(volume)}
-        onChange={(e) => {
-          const value = Number(e.target.value);
-          const newVolume = valueToVolume(value);
-          setVolume(newVolume);
-        }}
+        onChange={(e) => setVolume(valueToVolume(e.target.value))}
       />
     </div>
   )
