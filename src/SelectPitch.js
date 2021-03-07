@@ -13,7 +13,7 @@ export default function SelectPitch({ enabled, pitch, setPitch, oscillator }) {
   useEffect(() => play && safeStartOscillator(oscillator), [play, oscillator]);
   useEffect(() => oscillator.context[play ? 'resume' : 'suspend'](), [play, oscillator]);
   useEffect(() => !enabled && setPlaying(false), [enabled]);
-  useEffect(() => oscillator.frequency.setValueAtTime(pitch, oscillator.context.currentTime), [pitch, oscillator]);
+  useEffect(() => play && oscillator.frequency.setValueAtTime(pitch, oscillator.context.currentTime), [pitch, oscillator, play]);
 
   return (
     <div style={{ display: enabled ? 'block' : 'none' }}>

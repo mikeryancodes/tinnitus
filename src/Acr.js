@@ -17,18 +17,8 @@ export default function Acr({ enabled, pitch, oscillator }) {
   }, [setPlaying]);
 
   const start = useCallback(async () => {
-    let lastIndex;
     while (playingRef.current) {
-      for (let i = 1; i <= 3; i++) {
-        const indexPermutation = getValidIndexPermutation(p => p[0] !== lastIndex); // eslint-disable-line no-loop-func
-        for (let p = 0; p <= 3; p++) {
-          const pitch = pitches[indexPermutation[p]];
-          await playPitch(pitch, oscillator);
-          if (!playingRef.current) return;
-        }
-        lastIndex = indexPermutation[3];
-      }
-      await delay(1333);
+      await playMultiCycle(oscillator, playingRef, pitches);
     }
   }, [oscillator, playingRef, pitches]);
 
@@ -48,13 +38,59 @@ export default function Acr({ enabled, pitch, oscillator }) {
   );
 }
 
-async function playPitch(pitch, oscillator) {
-  oscillator.frequency.setValueAtTime(pitch, oscillator.context.currentTime);
+async function playMultiCycle(oscillator, playingRef, pitches) {
+  const startTime = oscillator.context.currentTime;
+  const [abort, toneCyclesSeconds] = await playToneCycles(oscillator, startTime, playingRef, pitches);
+  if (abort) return;
+  await audioContextDelay(startTime + toneCyclesSeconds + 1.333, oscillator.context, playingRef)
+}
+
+async function playToneCycles(oscillator, startTime, playingRef, pitches) {
+  const toneCyclesSeconds = scheduleToneCycles(oscillator, playingRef, pitches);
+  const abort = await waitForToneCycles(startTime + toneCyclesSeconds, oscillator, playingRef);
+  return [abort, toneCyclesSeconds];
+}
+
+function scheduleToneCycles(oscillator, playingRef, pitches) {
+  let lastIndex;
+  const delay = 0.667;
+  const iterations = 3;
+  for (let i = 0; i <= iterations - 1; i++) {
+    lastIndex = scheduleCycle(oscillator, playingRef, pitches, lastIndex, 0.667 * i);
+  }
+  return delay * iterations;
+}
+
+async function waitForToneCycles(targetTime, oscillator, playingRef) {
+  const abort = await audioContextDelay(targetTime, oscillator.context, playingRef);
+  if (abort) {
+    oscillator.frequency.cancelScheduledValues(oscillator.context.currentTime);
+    oscillator.frequency.setValueAtTime(null, oscillator.context.currentTime);
+    return;
+  }
+  return abort;
+}
+
+async function audioContextDelay(targetTime, audioContext, playingRef) {
+  while(audioContext.currentTime < targetTime) {
+    await delay(2);
+    if (playingRef.current) continue;
+    return true;
+  }
+  return false;
+}
+
+function scheduleCycle(oscillator, playingRef, pitches, lastIndex, baseOffset) {
+  const indexPermutation = getValidIndexPermutation(p => p[0] !== lastIndex); // eslint-disable-line no-loop-func
   safeStartOscillator(oscillator);
   oscillator.context.resume();
-  await delay(150);
-  oscillator.context.suspend();
-  await delay(17);
+  indexPermutation.forEach((index, i) => {
+    const pitch = pitches[index];
+    const time = oscillator.context.currentTime + baseOffset + 0.167 * i;
+    oscillator.frequency.setValueAtTime(pitch, time);
+    oscillator.frequency.setValueAtTime(null, time + 0.150);
+  });
+  return indexPermutation[3];
 }
 
 async function delay(ms) {
