@@ -17,6 +17,7 @@ export default function Acr({ enabled, pitch, oscillator }) {
   }, [setPlaying]);
 
   const start = useCallback(async () => {
+    ensureOscillator(oscillator);
     while (playingRef.current) {
       await playMultiCycle(oscillator, playingRef, pitches);
     }
@@ -82,8 +83,6 @@ async function audioContextDelay(targetTime, audioContext, playingRef) {
 
 function scheduleCycle(oscillator, playingRef, pitches, lastIndex, baseOffset) {
   const indexPermutation = getValidIndexPermutation(p => p[0] !== lastIndex); // eslint-disable-line no-loop-func
-  safeStartOscillator(oscillator);
-  oscillator.context.resume();
   indexPermutation.forEach((index, i) => {
     const pitch = pitches[index];
     const time = oscillator.context.currentTime + baseOffset + 0.167 * i;
@@ -91,6 +90,11 @@ function scheduleCycle(oscillator, playingRef, pitches, lastIndex, baseOffset) {
     oscillator.frequency.setValueAtTime(null, time + 0.150);
   });
   return indexPermutation[3];
+}
+
+function ensureOscillator(oscillator) {
+  safeStartOscillator(oscillator);
+  oscillator.context.resume();
 }
 
 async function delay(ms) {
